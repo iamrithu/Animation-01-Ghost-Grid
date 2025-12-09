@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+/* 👇 This tells Tailwind: "Make a class called .font-cinzel that uses this variable" */
+@theme {
+  --font-rithi: var(--font-rithi);
+  --font-oswald: var(--font-oswald);
+  
+  /* Map your colors to variables if you want to use bg-background etc. */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  /* Use a basic fallback until utility classes are applied */
+  font-family: sans-serif; 
+}
