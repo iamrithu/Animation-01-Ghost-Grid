@@ -8,8 +8,6 @@ import {
   Factory, 
   Building2, 
   ArrowRight,
-  MapPin,
-  CornerRightDown
 } from "lucide-react";
 import Image from "next/image";
 import React, { useRef, useState } from "react";
@@ -36,7 +34,7 @@ const SECTIONS: SectionItem[] = [
     desc: "Advanced reservoirs ensuring a sustainable future.",
     img: "https://images.pexels.com/photos/2699258/pexels-photo-2699258.jpeg",
     icon: Droplets,
-    color: "#06b6d4", // Cyan-500
+    color: "#06b6d4", // Cyan
   },
   {
     id: 2,
@@ -46,7 +44,7 @@ const SECTIONS: SectionItem[] = [
     desc: "Next-generation high-speed rail networks.",
     img: "https://images.pexels.com/photos/258510/pexels-photo-258510.jpeg",
     icon: TrainFront,
-    color: "#f59e0b", // Amber-500
+    color: "#f59e0b", // Amber
   },
   {
     id: 3,
@@ -56,7 +54,7 @@ const SECTIONS: SectionItem[] = [
     desc: "Transmission infrastructure for extreme loads.",
     img: "https://images.pexels.com/photos/189524/pexels-photo-189524.jpeg",
     icon: Zap,
-    color: "#8b5cf6", // Violet-500
+    color: "#8b5cf6", // Violet
   },
   {
     id: 4,
@@ -66,7 +64,7 @@ const SECTIONS: SectionItem[] = [
     desc: "Automated heavy-duty industrial framing.",
     img: "https://images.pexels.com/photos/257700/pexels-photo-257700.jpeg",
     icon: Factory,
-    color: "#10b981", // Emerald-500
+    color: "#10b981", // Emerald
   },
   {
     id: 5,
@@ -76,7 +74,7 @@ const SECTIONS: SectionItem[] = [
     desc: "Foundations bridging design and durability.",
     img: "https://images.pexels.com/photos/681335/pexels-photo-681335.jpeg",
     icon: Building2,
-    color: "#ec4899", // Pink-500
+    color: "#ec4899", // Pink
   },
 ];
 
@@ -91,12 +89,13 @@ const HeroSection = () => {
       onComplete: () => setIsLoaded(true)
     });
 
-    // 1. SETUP PANELS
+    // 1. SETUP PANELS (Initial State)
     const panels = gsap.utils.toArray('.visual-panel');
     panels.forEach((panel: any, i) => {
       const width = 100 / totalPanels;
       const left = i * width;
       const right = 100 - (left + width);
+      // Set initial Z-index to 1 so they are equal
       gsap.set(panel, { clipPath: `inset(0% ${right}% 0% ${left}%)`, zIndex: 1 });
     });
 
@@ -117,7 +116,7 @@ const HeroSection = () => {
   }, { scope: containerRef });
 
 
-  // --- CINEMATIC HOVER LOGIC ---
+  // --- STRICT HOVER LOGIC (FIXED) ---
   const handleHover = contextSafe((activeIndex: number) => {
     if (!isLoaded) return; 
     if (activeIndexRef.current === activeIndex) return;
@@ -125,12 +124,13 @@ const HeroSection = () => {
     activeIndexRef.current = activeIndex;
     const activeColor = SECTIONS[activeIndex].color;
 
-    // 1. Hide Center Title (Slower fade)
-    gsap.to('#main-content', { opacity: 0, scale: 0.95, duration: 0.6, overwrite: true });
+    // 1. Hide Center Title
+    gsap.to('#main-content', { opacity: 0, scale: 0.95, duration: 0.4, overwrite: true });
 
-    // 2. Update Nav UI (Refined timing)
+    // 2. Update Nav UI
     const navItems = document.querySelectorAll('.nav-item');
     navItems.forEach((nav, i) => {
+      // (Nav animation logic remains the same, just keeping it consistent)
       const borderTop = nav.querySelector('.nav-border');
       const lightBeam = nav.querySelector('.nav-beam');
       const title = nav.querySelector('.nav-title');
@@ -142,124 +142,67 @@ const HeroSection = () => {
       const number = nav.querySelector('.nav-number');
 
       if (i === activeIndex) {
-        // --- ACTIVE STATE ---
-        
-        // Border: Fill and Glow
-        gsap.to(borderTop, { 
-            width: '100%', 
-            backgroundColor: activeColor, 
-            height: '4px', 
-            boxShadow: `0 0 20px ${activeColor}`,
-            duration: 0.6, 
-            ease: "expo.out",
-            overwrite: true 
-        });
-        
-        // Light Beam: Shoot up
-        gsap.to(lightBeam, { 
-            opacity: 1, 
-            height: '100%',
-            background: `linear-gradient(to top, ${activeColor}20, transparent)`, 
-            duration: 0.8, 
-            ease: "power2.out",
-            overwrite: true 
-        });
-
-        // Icon Box: Colorize & Scale
-        gsap.to(iconBox, { 
-            backgroundColor: `${activeColor}20`, 
-            borderColor: activeColor,
-            duration: 0.5,
-            overwrite: true
-        });
+        gsap.to(borderTop, { width: '100%', backgroundColor: activeColor, height: '4px', boxShadow: `0 0 20px ${activeColor}`, duration: 0.6, ease: "expo.out", overwrite: true });
+        gsap.to(lightBeam, { opacity: 1, height: '100%', background: `linear-gradient(to top, ${activeColor}20, transparent)`, duration: 0.8, ease: "power2.out", overwrite: true });
+        gsap.to(iconBox, { backgroundColor: `${activeColor}20`, borderColor: activeColor, duration: 0.5, overwrite: true });
         gsap.to(icon, { color: activeColor, scale: 1.1, duration: 0.5, overwrite: true });
-
-        // Text: Lift & Highlight
         gsap.to(category, { color: activeColor, opacity: 1, duration: 0.4, overwrite: true });
         gsap.to(title, { y: -4, color: '#FFFFFF', duration: 0.5, overwrite: true });
-        
-        // Number: Fade out slightly/Shift
         gsap.to(number, { opacity: 0.1, x: 20, duration: 0.6, overwrite: true });
-
-        // CTA: Spring Up
-        gsap.to(ctaContainer, { 
-            y: 0, 
-            opacity: 1, 
-            duration: 0.8, 
-            ease: "elastic.out(1, 0.7)", // Bouncy effect
-            overwrite: true 
-        });
-        
-        // Button Styling
-        if(ctaBtn) {
-            gsap.to(ctaBtn, { 
-                backgroundColor: activeColor, 
-                boxShadow: `0 10px 30px -5px ${activeColor}66`,
-                color: '#000000',
-                duration: 0.4
-            });
-        }
-
+        gsap.to(ctaContainer, { y: 0, opacity: 1, duration: 0.8, ease: "elastic.out(1, 0.7)", overwrite: true });
+        if(ctaBtn) gsap.to(ctaBtn, { backgroundColor: activeColor, boxShadow: `0 10px 30px -5px ${activeColor}66`, color: '#000000', duration: 0.4 });
       } else {
-        // --- INACTIVE STATE ---
-        
-        // Border: Reset
         gsap.to(borderTop, { width: '100%', backgroundColor: 'rgba(255,255,255,0.05)', height: '1px', boxShadow: 'none', duration: 0.6, overwrite: true });
-        
-        // Light Beam: Reset
         gsap.to(lightBeam, { opacity: 0, height: '0%', duration: 0.6, overwrite: true });
-
-        // Icon Box: Reset
         gsap.to(iconBox, { backgroundColor: 'transparent', borderColor: 'rgba(255,255,255,0.1)', duration: 0.5, overwrite: true });
         gsap.to(icon, { color: '#71717a', scale: 1, duration: 0.5, overwrite: true });
-
-        // Text: Reset
         gsap.to(category, { color: '#71717a', opacity: 0.7, duration: 0.4, overwrite: true });
         gsap.to(title, { y: 0, color: '#a1a1aa', duration: 0.5, overwrite: true });
-        
-        // Number: Reset
         gsap.to(number, { opacity: 0.15, x: 0, duration: 0.6, overwrite: true });
-
-        // CTA: Hide
         gsap.to(ctaContainer, { y: 25, opacity: 0, duration: 0.4, overwrite: true });
       }
     });
 
-    // 3. SLOWER PANEL ANIMATION
+    // 3. PANELS LOGIC (THE FIX)
     const panels = gsap.utils.toArray('.visual-panel');
     panels.forEach((panel: any, i) => {
       const content = panel.querySelector('.panel-content');
       const img = panel.querySelector('img');
 
       if (i === activeIndex) {
+        // === ACTIVE PANEL ===
+        // CRITICAL: Set Z-Index immediately to jump on top of everything
         gsap.set(panel, { zIndex: 10 }); 
         
-        // Slower duration: 1.25s
         gsap.to(panel, { 
             clipPath: 'inset(0% 0% 0% 0%)', 
             duration: 1.25, 
-            ease: "power4.inOut", // Cinematic ease
-            overwrite: 'auto' 
+            ease: "power4.inOut", 
+            overwrite: true // Force overwrite
         });
         
-        // Content delays to let panel open first
-        gsap.to(content, { opacity: 1, y: 0, duration: 0.8, delay: 0.5, ease: "power2.out", overwrite: true });
+        // Show Content
+        gsap.to(content, { opacity: 1, y: 0, duration: 0.8, delay: 0.4, ease: "power2.out", overwrite: true });
         gsap.to(img, { scale: 1.1, opacity: 1, duration: 1.5, ease: "power2.out", overwrite: true });
       
       } else {
+        // === INACTIVE PANELS ===
         const width = 100 / totalPanels;
         const left = i * width;
         const right = 100 - (left + width);
+        
+        // CRITICAL: Set Z-Index immediately to drop behind
         gsap.set(panel, { zIndex: 1 });
         
         gsap.to(panel, { 
             clipPath: `inset(0% ${right}% 0% ${left}%)`, 
             duration: 1.25, 
             ease: "power4.inOut", 
-            overwrite: 'auto' 
+            overwrite: true // Force overwrite
         });
         
-        gsap.to(content, { opacity: 0, y: 30, duration: 0.4, overwrite: true });
+        // STRICTLY HIDE Content immediately
+        gsap.to(content, { opacity: 0, y: 30, duration: 0.2, overwrite: true });
         gsap.to(img, { scale: 1, opacity: 0.5, duration: 0.8, overwrite: true });
       }
     });
@@ -269,7 +212,7 @@ const HeroSection = () => {
     if (!isLoaded) return;
     activeIndexRef.current = null;
 
-    // Reset Nav
+    // Reset Nav (Same as before)
     const navItems = document.querySelectorAll('.nav-item');
     navItems.forEach(nav => {
       gsap.to(nav.querySelector('.nav-border'), { width: '100%', backgroundColor: 'rgba(255,255,255,0.05)', height: '1px', boxShadow: 'none', duration: 0.6, overwrite: true });
@@ -282,12 +225,14 @@ const HeroSection = () => {
       gsap.to(nav.querySelector('.nav-cta-container'), { y: 25, opacity: 0, duration: 0.4, overwrite: true });
     });
 
-    // Reset Panels (Slower)
+    // Reset Panels
     const panels = gsap.utils.toArray('.visual-panel');
     panels.forEach((panel: any, i) => {
       const width = 100 / totalPanels;
       const left = i * width;
       const right = 100 - (left + width);
+      
+      // CRITICAL: Reset all to equal Z-Index so they are flat strips
       gsap.set(panel, { zIndex: 1 });
       
       gsap.to(panel, { 
@@ -297,7 +242,7 @@ const HeroSection = () => {
         overwrite: true 
       });
       
-      gsap.to(panel.querySelector('.panel-content'), { opacity: 0, y: 30, duration: 0.4, overwrite: true });
+      gsap.to(panel.querySelector('.panel-content'), { opacity: 0, y: 30, duration: 0.2, overwrite: true });
       gsap.to(panel.querySelector('img'), { scale: 1, opacity: 0.8, duration: 1.2, overwrite: true });
     });
 
